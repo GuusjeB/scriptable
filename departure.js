@@ -4,10 +4,17 @@ req.method = "get";
 req.headers={"Ocp-Apim-Subscription-Key": subscription_key}
 const response = await req.loadJSON();
 
-for (const trip in response['trips']) {
-  var leg = trip['legs'][0]
-  var origin = leg['origin'].name
-  var destination = leg['destination'].name
-  var departuretime = leg.origin.actualDateTime 
-  console.log(`${origin}: ${destination} : ${departuretime}`);
+
+
+const trips = response.trips
+
+
+
+
+
+for (var index in trips) {
+  console.log(trips[index].legs[0].origin.name)
+ console.log(trips[index].legs[0].destination.name)
+  console.log(trips[index].legs[0].origin.actualDateTime)
+  console.log(trips[index].legs[0].origin.actualTrack)
 }
