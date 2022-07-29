@@ -70,6 +70,21 @@ req.headers={"Ocp-Apim-Subscription-Key": subscription_key}
 const response = await req.loadJSON();
 const trips = response.trips
 
+const destinations = [];
+const trackNumbers = [];
+const departureTimes = [];
+
+for (var index in trips) {
+    destinations.push(trips[index].legs[0].destination.name.toString())
+    trackNumbers.push(trips[index].legs[0].origin.actualTrack.toString())
+    departureTimes.push(trips[index].legs[0].origin.actualDateTime.toString())
+    // console.log(trips[index].legs[0].origin.name)
+    // console.log(trips[index].legs[0].destination.name)
+    // console.log(trips[index].legs[0].origin.actualDateTime)
+    // console.log(trips[index].legs[0].origin.actualTrack)
+  }
+
+
 //Calculates Departure time
 function calculateTimeOffset(times)
 {
@@ -177,7 +192,7 @@ function createWidget() {
     FOOTER_HEIGHT = 10
     FOOTER_FONT_SIZE = 8
   } else {
-    ITEMS_COUNT = 8
+    ITEMS_COUNT = 6//8
     HEADER_SIZE = 30
     COLUMN_HEIGHT = 20
     SPACING = 5
@@ -216,7 +231,7 @@ function createWidget() {
 
   // Horizontal spacer under headline (station) string
   stack.addSpacer(8);
-  
+
   for (let i = 0; i < ITEMS_COUNT; i++) {
     // Will be set up with 3 columns to show line, destination and departure time
     // left column contains line logos
@@ -231,7 +246,7 @@ function createWidget() {
     linestack.size = LOGO_SIZE
     linestack.centerAlignContent()
     linestack.backgroundColor = new Color("Yellow")
-    let lineName = linestack.addText("12300")
+    let lineName = linestack.addText(trackNumbers[i])
     // let lineName = linestack.addText(trips[i].legs[0].name.toString())
     lineName.font = Font.boldSystemFont(LOGO_FONT_SIZE)
     lineName.textColor = Color.white()
