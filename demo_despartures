@@ -1,0 +1,77 @@
+// Variables used by Scriptable.
+// These must be at the very top of the file. Do not edit.
+// icon-color: blue; icon-glyph: bus-alt;
+
+// Script to show real time SL departure information using the SL real-time API https://www.trafiklab.se/node/15754/documentation
+
+// Todo: Pass siteID and StopPointNumber as arguments
+const siteID = "9001" // 9001 is T-Centralen, replace with your station's ID. See: https://www.trafiklab.se/api/sl-platsuppslag/dokumentation
+const myKey = "thekey" // Replace with your key, get it from https://www.trafiklab.se/api/sl-platsuppslag
+const timeWindow = "30" // Show departures in the next 30 minutes
+const myStopPointNumber = "" // Specify a StopPointNumber if you want departures only from a specific spot — e.g. with buses, each "direction" has a direction has a different StopPointNumber, even if siteID is the same. Leave it blank if you want to track departures in all directions
+
+const maxEntries = 6 // Display the next 6 departures
+const maxChars = 22 // Max characters to display of the Destination (middle column)
+
+const bgColour = new Color("#000000") // Use solid black background
+const lineFont = new Font("Menlo",14)
+const footerFont = new Font("Helvetica",13)
+
+let url = "https://api.sl.se/api2/realtimedeparturesV4.json?key=" + myKey + "&siteid=" + siteID + "&timewindow=" + timeWindow
+
+let req = new Request(url)
+let json = await req.loadJSON()
+
+// Todo: Show all/ specific departure types (e.g. Metro/ Train/ Ship etc.) as well
+items = json.ResponseData.Buses // This script only cares about buses, refer to documentation at https://www.trafiklab.se/node/15754/documentation for details about other departure types
+
+let widget = await createWidget(items)
+
+if (!config.runsInWidget) { // Show a preview of the widget, if it's not being run as a widget
+  await widget.presentMedium()
+}
+
+Script.setWidget(widget)
+Script.complete()
+
+async function createWidget(items) {
+  let w = new ListWidget()
+  let num = 0
+  
+  w.backgroundColor = bgColour
+      
+  for (item of items) {
+    
+    let lineNumber = item.LineNumber
+    let stopPointNumber = item.StopPointNumber
+    
+    if (myStopPointNumber != "") { // If it's not empty, we only care about a specific StopPointNumber
+      if (stopPointNumber != myStopPointNumber) { // We don't care about this StopPointNumber
+        continue 
+      }
+    }
+    
+    let destination = item.Destination
+    let displayTime = item.DisplayTime
+    
+    let theLine = w.addText(lineNumber + "\t" + destination.trim(maxChars).padEnd(maxChars," ") + "\t" + displayTime)
+    theLine.font = lineFont
+    
+    num = num + 1
+    if (num == maxEntries) {
+      break
+    }
+  }
+  
+  w.addSpacer(10)
+
+  let theFooter = w.addText("Updated: " + await timehMMSS())
+  theFooter.font = footerFont
+  
+  return w
+}
+
+async function timehMMSS() {
+  var theDate = new Date() 
+  return theDate.getHours() + ":" + ("0"+theDate.getMinutes()).slice(-2) + ":" + ("0"+theDate.getSeconds()).slice(-2)
+}
