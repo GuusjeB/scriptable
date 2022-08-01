@@ -1,66 +1,12 @@
 // Variables used by Scriptable.
 // These must be at the very top of the file. Do not edit.
 // icon-color: blue; icon-glyph: subway;
-/************************************************
-
-MVG Abfahrtsmonitor Widget
-von Jacob Eckert
-16.02.2021
-
-GitHub für Updates:
-https://github.com/eckertj/MVG-Abfahrtsmonitor
-
-Für dieses Widget gilt die Apache 2.0 Lizenz
-https://github.com/eckertj/MVG-Abfahrtsmonitor/blob/master/LICENSE
-
-Dieses Widget zeigt aktuelle Abfahrten von Bus, Bahn
-und/oder Tram des Münchner Verkehrs- und Tarifverbunds
-für eine definierte Haltestelle an. 
-
-Die Daten stammen von mvg.de. 
-Unterstützt iOS 14 Widget in klein, mittel und groß.
-
-Im Widget-Parameter kann die Haltestelle per Namen definiert
-werden. Genaue Bezeichnungen der Haltestellen können
-hier eingesehen werden:
-https://www.mvg.de/dienste/abfahrtszeiten.html
-
-Installation des Widgets:
-1. Lange auf eine App auf dem Home-Screen drücken.
-2. "Home-Bildschirm bearbeiten" auswählen.
-3. Oben auf das "+" drücken
-4. Runterscrollen bis "Scriptable" in der Liste erscheint.
-5. Gewünschte Widgetgröße auswählen.
-6. Auf das neue Widget drücken.
-7. Bei Script "MVG-Abfahrtsmonitor" auswählen.
-8. Bei When Interacting 'Run Script' auswählen.
-9. Bei Parameter gewünsche Haltestelle eingeben.
-10. Fertig. Später kann die Haltestelle angepasst werden,
-   wenn lange auf das Widget gedrückt wird und
-   "Scriptable/Widget bearbeiten" ausgewählt wird.
-    
-Hinweis: Es können mehrere Widgets auf den Home Screen
-gelegt und individuell konfiguriert werden!
-
-************************************************/
+// ************************************************
 
 //Set for Debug in App
-//const station = "Marienplatz"
 //const station = "Utrecht Centraal"
 const station = "Amsterdam Centraal"
 //const station = args.widgetParameter
-
-//Set your preferred MVG products
-const footway = false
-const bus = true
-const ubahn = true
-const sbahn = true
-const tram = true
-const zug = false
-
-//Get departures
-// const mvgReq = "https://www.mvg.de/api/fahrinfo/departure/" + mvgID + "?sbahn=" + sbahn + "&ubahn=" + ubahn + "&bus=" + bus + "&tram=" + tram + "&footway" + footway + "&zug=" + zug
-// let response = await new Request(mvgReq).loadJSON()
 
 // Get departures NS trains
 const subscription_key = ""
@@ -95,12 +41,6 @@ for (var index in trips) {
          }
     }
     destinations.push(trips[index].legs[0].destination.name.toString().replace('Centraal', 'Cs'))
-    // trackNumbers.push(trips[index].legs[0].origin.actualTrack.toString())
-    // departureTimes.push(trips[index].legs[0].origin.actualDateTime.toString())
-    // console.log(trips[index].legs[0].origin.name)
-    // console.log(trips[index].legs[0].destination.name)
-    // console.log(trips[index].legs[0].origin.actualDateTime)
-    // console.log(trips[index].legs[0].origin.actualTrack)
   }
 
 
@@ -284,7 +224,6 @@ function createWidget() {
     linestack.centerAlignContent()
     linestack.backgroundColor = new Color("Yellow")
     let lineName = linestack.addText(trackNumbers[i])
-    // let lineName = linestack.addText(trips[i].legs[0].name.toString())
     lineName.font = Font.boldSystemFont(LOGO_FONT_SIZE)
     lineName.textColor = Color.white()
     lineName.centerAlignText()
@@ -296,8 +235,6 @@ function createWidget() {
     destinationStack.layoutVertically()
     destinationStack.bottomAlignContent()
     let destinationName = destinationStack.addText(truncate(destinations[i]))
-    // let destinationName = destinationStack.addText(truncate(trips[i].legs[0].destination.name.toString()))
-    // let destinationName = destinationStack.addText(truncate(response.departures[i].destination.toString()))
     destinationName.font = Font.lightSystemFont(STATION_FONT_SIZE)
     destinationName.textColor = Color.white()
     destinationName.leftAlignText()
@@ -313,7 +250,6 @@ function createWidget() {
     if (widgetSize == 'medium' ||  widgetSize == 'large') {
       extension = " Min"
     }
-    // let departureTime = departureStack.addText(calculateDeparture(response.departures[i].delay,calculateTimeOffset(response.departures[i].departureTime)) + extension)
     let departureOffset = departureStack.addText(calculateTimeOffset(departureTimes[i]))
     departureOffset.font = Font.boldSystemFont(DEPART_FONT_SIZE)
     departureOffset.textColor = Color.white()
@@ -325,7 +261,6 @@ function createWidget() {
     timeStack.bottomAlignContent()
 
     // This right column add time left to departure
-    // let departureTime = departureStack.addText(calculateDeparture(response.departures[i].delay,calculateTimeOffset(response.departures[i].departureTime)) + extension)
     let departureTime = timeStack.addText(timeOnly(departureTimes[i]))
     departureTime.font = Font.boldSystemFont(TIME_FONT_SIZE)
     departureTime.textColor = Color.white()
