@@ -94,7 +94,7 @@ for (var index in trips) {
             trackNumbers.push("")
          }
     }
-    destinations.push(trips[index].legs[0].destination.name.toString())
+    destinations.push(trips[index].legs[0].destination.name.toString().replace('Centraal', 'Cs'))
     // trackNumbers.push(trips[index].legs[0].origin.actualTrack.toString())
     // departureTimes.push(trips[index].legs[0].origin.actualDateTime.toString())
     // console.log(trips[index].legs[0].origin.name)
@@ -217,7 +217,7 @@ function createWidget() {
     SPACING = 5
     PADDING = SPACING
     LOGO_SIZE = new Size(35, COLUMN_HEIGHT)
-    STATION_SIZE = new Size(185, COLUMN_HEIGHT)
+    STATION_SIZE = new Size(90, COLUMN_HEIGHT)
     DEPART_SIZE = new Size(60, COLUMN_HEIGHT)
     LOGO_FONT_SIZE = 14
     STATION_FONT_SIZE = 20
