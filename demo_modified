@@ -19,13 +19,19 @@ const trips = response.trips
 const destinations = [];
 const trackNumbers = [];
 const departureTimes = [];
+const delays = [];
 
 for (var index in trips) {
-  
+
     if (trips[index].legs[0].product.categoryCode != 'IC') { continue; }
 
     if ('actualDateTime' in trips[index].legs[0].origin) {
         departureTimes.push(trips[index].legs[0].origin.actualDateTime.toString())
+        if ('plannedDateTime' in trips[index].legs[0].origin) {
+          const delay = Math.ceil((Date('actualDateTime' in trips[index].legs[0].origin) - Date('plannedDateTime' in trips[index].legs[0].origin)) / 60000)
+          if (delay > 0) {delays.push('+ ' + delay.toString())} 
+          else {delays.push('')}
+        }
       } else {
          if ('plannedDateTime' in trips[index].legs[0].origin) {
             departureTimes.push(trips[index].legs[0].origin.plannedDateTime.toString())
@@ -145,10 +151,12 @@ function createWidget() {
     STATION_SIZE = new Size(80, COLUMN_HEIGHT)
     DEPART_SIZE = new Size(20, COLUMN_HEIGHT)
     TIME_SIZE = new Size(20, COLUMN_HEIGHT)
+    DELAY_SIZE = new Size(20, COLUMN_HEIGHT)
     LOGO_FONT_SIZE = 12
     STATION_FONT_SIZE = 14
     DEPART_FONT_SIZE = 12
     TIME_FONT_SIZE = 12
+    DELAY_FONT_SIZE = 12
     HEADLINE_FONT_SIZE = 16
     FOOTER_HEIGHT = 20
     FOOTER_FONT_SIZE = 6
@@ -159,13 +167,15 @@ function createWidget() {
     SPACING = 3
     PADDING = SPACING
     LOGO_SIZE = new Size(35, COLUMN_HEIGHT)
-    STATION_SIZE = new Size(185, COLUMN_HEIGHT)
+    STATION_SIZE = new Size(80, COLUMN_HEIGHT)
     DEPART_SIZE = new Size(60, COLUMN_HEIGHT)
     TIME_SIZE = new Size(60, COLUMN_HEIGHT)
+    DELAY_SIZE = new Size(60, COLUMN_HEIGHT)
     LOGO_FONT_SIZE = 14
     STATION_FONT_SIZE = 20
     DEPART_FONT_SIZE = 16
     TIME_FONT_SIZE = 16
+    DELAY_FONT_SIZE = 16
     HEADLINE_FONT_SIZE = 24
     FOOTER_HEIGHT = 10
     FOOTER_FONT_SIZE = 8
@@ -179,10 +189,12 @@ function createWidget() {
     STATION_SIZE = new Size(90, COLUMN_HEIGHT)
     DEPART_SIZE = new Size(60, COLUMN_HEIGHT)
     TIME_SIZE = new Size(60, COLUMN_HEIGHT)
+    DELAY_SIZE = new Size(60, COLUMN_HEIGHT)
     LOGO_FONT_SIZE = 14
     STATION_FONT_SIZE = 20
     DEPART_FONT_SIZE = 16
     TIME_FONT_SIZE = 16
+    DELAY_FONT_SIZE = 16
     HEADLINE_FONT_SIZE = 24
     FOOTER_HEIGHT = 25
     FOOTER_FONT_SIZE = 8
@@ -202,7 +214,7 @@ function createWidget() {
   const topStack = stack.addStack();
   topStack.layoutVertically();
   //topStack.centerAlignContent()
-  topStack.size = new Size(LOGO_SIZE.width + STATION_SIZE.width + DEPART_SIZE.width + TIME_SIZE.width + 2*SPACING, HEADER_SIZE);
+  topStack.size = new Size(LOGO_SIZE.width + STATION_SIZE.width + DEPART_SIZE.width + DELAY_SIZE.width + 2*SPACING, HEADER_SIZE);
 
   const stationName = topStack.addText(station.toString());
   stationName.textColor = Color.white();
@@ -217,7 +229,7 @@ function createWidget() {
     // left column contains line logos
     const bottomStack = stack.addStack();
     bottomStack.spacing = SPACING
-    bottomStack.size = new Size(LOGO_SIZE.width + STATION_SIZE.width + DEPART_SIZE.width + TIME_SIZE.width + 2*SPACING, COLUMN_HEIGHT + 2*SPACING)
+    bottomStack.size = new Size(LOGO_SIZE.width + STATION_SIZE.width + DEPART_SIZE.width + TIME_SIZE.width + DELAY_SIZE.width + 2*SPACING, COLUMN_HEIGHT + 2*SPACING)
     bottomStack.layoutHorizontally();
     bottomStack.centerAlignContent()
 
@@ -269,11 +281,22 @@ function createWidget() {
     departureTime.textColor = Color.white()
     departureTime.rightAlignText()
     departureTime.minimumScaleFactor = 0.95
+
+    const delayStack = bottomStack.addStack();
+    delayStack.size = DELAY_SIZE
+    delayStack.bottomAlignContent()
+
+    // This right column add time left to departure
+    let delayMinutes = timeStack.addText(timeOnly(delays[i]))
+    delayMinutes.font = Font.lightSystemFont(DELAY_FONT_SIZE)
+    delayMinutes.textColor = Color.red()
+    delayMinutes.rightAlignText()
+    delayMinutes.minimumScaleFactor = 0.95
   }
 
   const updatedstack = stack.addStack();
   updatedstack.bottomAlignContent()
-  updatedstack.size = new Size(LOGO_SIZE.width + STATION_SIZE.width + DEPART_SIZE.width + TIME_SIZE.width + 2*SPACING, FOOTER_HEIGHT)
+  updatedstack.size = new Size(LOGO_SIZE.width + STATION_SIZE.width + DEPART_SIZE.width + TIME_SIZE.width + DELAY_SIZE.width + 2*SPACING, FOOTER_HEIGHT)
   let lastUpdateTime = updatedstack.addText(createDateString())
   lastUpdateTime.font = Font.lightSystemFont(8)
   lastUpdateTime.textColor = Color.white()
