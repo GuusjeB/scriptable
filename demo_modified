@@ -21,6 +21,9 @@ const trackNumbers = [];
 const departureTimes = [];
 
 for (var index in trips) {
+  
+    if (trips[index].legs[0].product.categoryCode != 'IC') { continue; }
+
     if ('actualDateTime' in trips[index].legs[0].origin) {
         departureTimes.push(trips[index].legs[0].origin.actualDateTime.toString())
       } else {
@@ -53,7 +56,7 @@ function calculateTimeOffset(times)
 //Calculates Departure time
 function timeOnly(times)
 {
-  timestamp = Date.parse(times)
+  const timestamp = Date(times)
   let hours = (timestamp.getHours().toString().length > 1) ? timestamp.getHours().toString() : "0" + timestamp.getHours().toString()
   let minutes = (timestamp.getMinutes().toString().length > 1) ? timestamp.getMinutes().toString() : "0" + timestamp.getMinutes().toString()
   return hours + ':' + minutes
@@ -153,7 +156,7 @@ function createWidget() {
     ITEMS_COUNT = 3
     HEADER_SIZE = 25
     COLUMN_HEIGHT = 20
-    SPACING = 5
+    SPACING = 3
     PADDING = SPACING
     LOGO_SIZE = new Size(35, COLUMN_HEIGHT)
     STATION_SIZE = new Size(185, COLUMN_HEIGHT)
@@ -170,7 +173,7 @@ function createWidget() {
     ITEMS_COUNT = 6//8
     HEADER_SIZE = 30
     COLUMN_HEIGHT = 20
-    SPACING = 5
+    SPACING = 3
     PADDING = SPACING
     LOGO_SIZE = new Size(35, COLUMN_HEIGHT)
     STATION_SIZE = new Size(90, COLUMN_HEIGHT)
@@ -199,7 +202,7 @@ function createWidget() {
   const topStack = stack.addStack();
   topStack.layoutVertically();
   //topStack.centerAlignContent()
-  topStack.size = new Size(LOGO_SIZE.width + STATION_SIZE.width + DEPART_SIZE.width + 2*SPACING, HEADER_SIZE);
+  topStack.size = new Size(LOGO_SIZE.width + STATION_SIZE.width + DEPART_SIZE.width + TIME_SIZE.width + 2*SPACING, HEADER_SIZE);
 
   const stationName = topStack.addText(station.toString());
   stationName.textColor = Color.white();
@@ -214,7 +217,7 @@ function createWidget() {
     // left column contains line logos
     const bottomStack = stack.addStack();
     bottomStack.spacing = SPACING
-    bottomStack.size = new Size(LOGO_SIZE.width + STATION_SIZE.width + DEPART_SIZE.width + 2*SPACING, COLUMN_HEIGHT + 2*SPACING)
+    bottomStack.size = new Size(LOGO_SIZE.width + STATION_SIZE.width + DEPART_SIZE.width + TIME_SIZE.width + 2*SPACING, COLUMN_HEIGHT + 2*SPACING)
     bottomStack.layoutHorizontally();
     bottomStack.centerAlignContent()
 
@@ -250,7 +253,7 @@ function createWidget() {
     if (widgetSize == 'medium' ||  widgetSize == 'large') {
       extension = " Min"
     }
-    let departureOffset = departureStack.addText(calculateTimeOffset(departureTimes[i]).toString())
+    let departureOffset = departureStack.addText(calculateTimeOffset(departureTimes[i]).toString() + ' "')
     departureOffset.font = Font.boldSystemFont(DEPART_FONT_SIZE)
     departureOffset.textColor = Color.white()
     departureOffset.rightAlignText()
@@ -262,7 +265,7 @@ function createWidget() {
 
     // This right column add time left to departure
     let departureTime = timeStack.addText(timeOnly(departureTimes[i]))
-    departureTime.font = Font.boldSystemFont(TIME_FONT_SIZE)
+    departureTime.font = Font.lightSystemFont(TIME_FONT_SIZE)
     departureTime.textColor = Color.white()
     departureTime.rightAlignText()
     departureTime.minimumScaleFactor = 0.95
