@@ -277,7 +277,7 @@ function createWidget() {
     destinationStack.size = STATION_SIZE
     destinationStack.layoutVertically()
     destinationStack.bottomAlignContent()
-    let destinationName = destinationStack.addText(truncate("Utrecht Centraal"))
+    let destinationName = destinationStack.addText(truncate(destinations[i]))
     // let destinationName = destinationStack.addText(truncate(trips[i].legs[0].destination.name.toString()))
     // let destinationName = destinationStack.addText(truncate(response.departures[i].destination.toString()))
     destinationName.font = Font.lightSystemFont(STATION_FONT_SIZE)
@@ -296,7 +296,7 @@ function createWidget() {
       extension = " Min"
     }
     // let departureTime = departureStack.addText(calculateDeparture(response.departures[i].delay,calculateTimeOffset(response.departures[i].departureTime)) + extension)
-    let departureTime = departureStack.addText("10" + extension)
+    let departureTime = departureStack.addText(departureTimes[i])
     departureTime.font = Font.boldSystemFont(DEPART_FONT_SIZE)
     departureTime.textColor = Color.white()
     departureTime.rightAlignText()
