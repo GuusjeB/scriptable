@@ -107,7 +107,7 @@ for (var index in trips) {
 //Calculates Departure time
 function calculateTimeOffset(times)
 {
-  return Math.ceil((times - Date.now()) / 60000)
+  return Math.ceil((Date.parse(times) - Date.now()) / 60000)
 }
 
 //Calculates expected departure incl. delay
@@ -296,7 +296,7 @@ function createWidget() {
       extension = " Min"
     }
     // let departureTime = departureStack.addText(calculateDeparture(response.departures[i].delay,calculateTimeOffset(response.departures[i].departureTime)) + extension)
-    let departureTime = departureStack.addText(departureTimes[i])
+    let departureTime = departureStack.addText(calculateTimeOffset(departureTimes[i]))
     departureTime.font = Font.boldSystemFont(DEPART_FONT_SIZE)
     departureTime.textColor = Color.white()
     departureTime.rightAlignText()
