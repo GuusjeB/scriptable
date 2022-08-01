@@ -250,7 +250,7 @@ function createWidget() {
     if (widgetSize == 'medium' ||  widgetSize == 'large') {
       extension = " Min"
     }
-    let departureOffset = departureStack.addText(calculateTimeOffset(departureTimes[i]))
+    let departureOffset = departureStack.addText(calculateTimeOffset(departureTimes[i]).toString())
     departureOffset.font = Font.boldSystemFont(DEPART_FONT_SIZE)
     departureOffset.textColor = Color.white()
     departureOffset.rightAlignText()
