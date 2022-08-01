@@ -21,20 +21,20 @@ const trackNumbers = [];
 const departureTimes = [];
 
 for (var index in trips) {
-    if (actualDateTime in trips[index].legs[0].origin) {
+    if ('actualDateTime' in trips[index].legs[0].origin) {
         departureTimes.push(trips[index].legs[0].origin.actualDateTime.toString())
       } else {
-         if (plannedDateTime in trips[index].legs[0].origin) {
+         if ('plannedDateTime' in trips[index].legs[0].origin) {
             departureTimes.push(trips[index].legs[0].origin.plannedDateTime.toString())
          } else {
             departureTimes.push("")
          }
         
     }
-    if (actualTrack in trips[index].legs[0].origin) {
+    if ('actualTrack' in trips[index].legs[0].origin) {
         trackNumbers.push(trips[index].legs[0].origin.actualTrack.toString())
       } else {
-         if (plannedTrack in trips[index].legs[0].origin) {
+         if ('plannedTrack' in trips[index].legs[0].origin) {
             trackNumbers.push(trips[index].legs[0].origin.plannedTrack.toString())
          } else {
             trackNumbers.push("")
