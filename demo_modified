@@ -75,9 +75,28 @@ const trackNumbers = [];
 const departureTimes = [];
 
 for (var index in trips) {
+    if (actualDateTime in trips[index].legs[0].origin) {
+        departureTimes.push(trips[index].legs[0].origin.actualDateTime.toString())
+      } else {
+         if (plannedDateTime in trips[index].legs[0].origin) {
+            departureTimes.push(trips[index].legs[0].origin.plannedDateTime.toString())
+         } else {
+            departureTimes.push("")
+         }
+        
+    }
+    if (actualTrack in trips[index].legs[0].origin) {
+        trackNumbers.push(trips[index].legs[0].origin.actualTrack.toString())
+      } else {
+         if (plannedTrack in trips[index].legs[0].origin) {
+            trackNumbers.push(trips[index].legs[0].origin.plannedTrack.toString())
+         } else {
+            trackNumbers.push("")
+         }
+    }
     destinations.push(trips[index].legs[0].destination.name.toString())
-    trackNumbers.push(trips[index].legs[0].origin.actualTrack.toString())
-    departureTimes.push(trips[index].legs[0].origin.actualDateTime.toString())
+    // trackNumbers.push(trips[index].legs[0].origin.actualTrack.toString())
+    // departureTimes.push(trips[index].legs[0].origin.actualDateTime.toString())
     // console.log(trips[index].legs[0].origin.name)
     // console.log(trips[index].legs[0].destination.name)
     // console.log(trips[index].legs[0].origin.actualDateTime)
