@@ -110,6 +110,16 @@ function calculateTimeOffset(times)
   return Math.ceil((Date.parse(times) - Date.now()) / 60000)
 }
 
+//Calculates Departure time
+function timeOnly(times)
+{
+  timestamp = Date.parse(times)
+  let hours = (timestamp.getHours().toString().length > 1) ? timestamp.getHours().toString() : "0" + timestamp.getHours().toString()
+  let minutes = (timestamp.getMinutes().toString().length > 1) ? timestamp.getMinutes().toString() : "0" + timestamp.getMinutes().toString()
+  return hours + ':' + minutes
+}
+
+
 //Calculates expected departure incl. delay
 function calculateDeparture (delay, time) {
   if (delay == undefined)
@@ -173,9 +183,11 @@ function createWidget() {
   let LOGO_SIZE
   let STATION_SIZE
   let DEPART_SIZE
+  let TIME_SIZE
   let LOGO_FONT_SIZE
   let STATION_FONT_SIZE
   let DEPART_FONT_SIZE
+  let TIME_FONT_SIZE
   let HEADLINE_FONT_SIZE
   let FOOTER_HEIGHT
   let FOOTER_FONT_SIZE
@@ -189,9 +201,11 @@ function createWidget() {
     LOGO_SIZE = new Size(20, COLUMN_HEIGHT)
     STATION_SIZE = new Size(80, COLUMN_HEIGHT)
     DEPART_SIZE = new Size(20, COLUMN_HEIGHT)
+    TIME_SIZE = new Size(20, COLUMN_HEIGHT)
     LOGO_FONT_SIZE = 12
     STATION_FONT_SIZE = 14
     DEPART_FONT_SIZE = 12
+    TIME_FONT_SIZE = 12
     HEADLINE_FONT_SIZE = 16
     FOOTER_HEIGHT = 20
     FOOTER_FONT_SIZE = 6
@@ -204,9 +218,11 @@ function createWidget() {
     LOGO_SIZE = new Size(35, COLUMN_HEIGHT)
     STATION_SIZE = new Size(185, COLUMN_HEIGHT)
     DEPART_SIZE = new Size(60, COLUMN_HEIGHT)
+    TIME_SIZE = new Size(60, COLUMN_HEIGHT)
     LOGO_FONT_SIZE = 14
     STATION_FONT_SIZE = 20
     DEPART_FONT_SIZE = 16
+    TIME_FONT_SIZE = 16
     HEADLINE_FONT_SIZE = 24
     FOOTER_HEIGHT = 10
     FOOTER_FONT_SIZE = 8
@@ -219,9 +235,11 @@ function createWidget() {
     LOGO_SIZE = new Size(35, COLUMN_HEIGHT)
     STATION_SIZE = new Size(90, COLUMN_HEIGHT)
     DEPART_SIZE = new Size(60, COLUMN_HEIGHT)
+    TIME_SIZE = new Size(60, COLUMN_HEIGHT)
     LOGO_FONT_SIZE = 14
     STATION_FONT_SIZE = 20
     DEPART_FONT_SIZE = 16
+    TIME_FONT_SIZE = 16
     HEADLINE_FONT_SIZE = 24
     FOOTER_HEIGHT = 25
     FOOTER_FONT_SIZE = 8
@@ -296,8 +314,20 @@ function createWidget() {
       extension = " Min"
     }
     // let departureTime = departureStack.addText(calculateDeparture(response.departures[i].delay,calculateTimeOffset(response.departures[i].departureTime)) + extension)
-    let departureTime = departureStack.addText(calculateTimeOffset(departureTimes[i]))
-    departureTime.font = Font.boldSystemFont(DEPART_FONT_SIZE)
+    let departureOffset = departureStack.addText(calculateTimeOffset(departureTimes[i]))
+    departureOffset.font = Font.boldSystemFont(DEPART_FONT_SIZE)
+    departureOffset.textColor = Color.white()
+    departureOffset.rightAlignText()
+    departureOffset.minimumScaleFactor = 0.95
+
+    const timeStack = bottomStack.addStack();
+    timeStack.size = TIME_SIZE
+    timeStack.bottomAlignContent()
+
+    // This right column add time left to departure
+    // let departureTime = departureStack.addText(calculateDeparture(response.departures[i].delay,calculateTimeOffset(response.departures[i].departureTime)) + extension)
+    let departureTime = timeStack.addText(timeOnly(departureTimes[i]))
+    departureTime.font = Font.boldSystemFont(TIME_FONT_SIZE)
     departureTime.textColor = Color.white()
     departureTime.rightAlignText()
     departureTime.minimumScaleFactor = 0.95
@@ -305,7 +335,7 @@ function createWidget() {
 
   const updatedstack = stack.addStack();
   updatedstack.bottomAlignContent()
-  updatedstack.size = new Size(LOGO_SIZE.width + STATION_SIZE.width + DEPART_SIZE.width + 2*SPACING, FOOTER_HEIGHT)
+  updatedstack.size = new Size(LOGO_SIZE.width + STATION_SIZE.width + DEPART_SIZE.width + TIME_SIZE.width + 2*SPACING, FOOTER_HEIGHT)
   let lastUpdateTime = updatedstack.addText(createDateString())
   lastUpdateTime.font = Font.lightSystemFont(8)
   lastUpdateTime.textColor = Color.white()
