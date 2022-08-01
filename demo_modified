@@ -170,7 +170,7 @@ function createWidget() {
     STATION_SIZE = new Size(80, COLUMN_HEIGHT)
     DEPART_SIZE = new Size(60, COLUMN_HEIGHT)
     TIME_SIZE = new Size(60, COLUMN_HEIGHT)
-    DELAY_SIZE = new Size(60, COLUMN_HEIGHT)
+    DELAY_SIZE = new Size(20, COLUMN_HEIGHT)
     LOGO_FONT_SIZE = 14
     STATION_FONT_SIZE = 20
     DEPART_FONT_SIZE = 16
@@ -189,7 +189,7 @@ function createWidget() {
     STATION_SIZE = new Size(90, COLUMN_HEIGHT)
     DEPART_SIZE = new Size(60, COLUMN_HEIGHT)
     TIME_SIZE = new Size(60, COLUMN_HEIGHT)
-    DELAY_SIZE = new Size(60, COLUMN_HEIGHT)
+    DELAY_SIZE = new Size(40, COLUMN_HEIGHT)
     LOGO_FONT_SIZE = 14
     STATION_FONT_SIZE = 20
     DEPART_FONT_SIZE = 16
