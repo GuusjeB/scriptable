@@ -20,7 +20,7 @@ const destinations = [];
 const trackNumbers = [];
 const departureTimes = [];
 const delays = [];
-const IC_COUNT = 0
+let IC_COUNT = 0
 
 for (var index in trips) {
 
@@ -48,16 +48,19 @@ for (var index in trips) {
         // If only actualDateTime is present
         } else {
           departureTimes.push(actualDateTime.toString())
+          delays.push('')
         }
     } else {
          // If only plannedDateTime is present
          if ('plannedDateTime' in trips[index].legs[0].origin) {
             const plannedDateTime = new Date(trips[index].legs[0].origin.plannedDateTime)
             departureTimes.push(plannedDateTime.toString())
+            delays.push('')
          // No departure time is present
          } else {
             departureTimes.push("")
             console.log("missing departureTime for trip " + index)
+            delays.push('')
          }
     }
 
@@ -304,7 +307,7 @@ function createWidget() {
     const delayStack = bottomStack.addStack();
     delayStack.size = DELAY_SIZE
     delayStack.centerAlignContent()
-    let delayMinutes = timeStack.addText(timeOnly(delays[i]))
+    let delayMinutes = timeStack.addText(delays[i])
     delayMinutes.font = Font.lightSystemFont(DELAY_FONT_SIZE)
     delayMinutes.textColor = Color.red()
     delayMinutes.rightAlignText()
