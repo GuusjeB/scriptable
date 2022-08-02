@@ -20,26 +20,48 @@ const destinations = [];
 const trackNumbers = [];
 const departureTimes = [];
 const delays = [];
+const IC_COUNT = 0
 
 for (var index in trips) {
 
     if (trips[index].legs[0].product.categoryCode != 'IC') { continue; }
+    // Keep track of number of trips with IC
+    IC_COUNT = IC_COUNT + 1;
 
+    // Always show planned datetime if both are present
+    //  If both are present and they differ: show delayed minutes
     if ('actualDateTime' in trips[index].legs[0].origin) {
-        departureTimes.push(trips[index].legs[0].origin.actualDateTime.toString())
+        const actualDateTime = new Date(trips[index].legs[0].origin.actualDateTime)
+        
+        // if both planned and actual time are present: calculate possible delay
         if ('plannedDateTime' in trips[index].legs[0].origin) {
-          const delay = Math.ceil((Date(trips[index].legs[0].origin.actualDateTime) - Date(trips[index].legs[0].origin.plannedDateTime)) / 60000)
-          if (delay > 0) {delays.push('+ ' + delay.toString())} 
-          else {delays.push('')}
+          const plannedDateTime = new Date(trips[index].legs[0].origin.plannedDateTime)
+          departureTimes.push(actualDateTime.toString())
+
+          // Calculate possible delay
+          const delay = Math.ceil((actualDateTime -  plannedDateTime) / 60000)
+
+          // If there is a delay, store it in array
+          if (delay > 0) {delays.push('+ ' + delay.toString()) 
+          } else {delays.push('')}
+        
+        // If only actualDateTime is present
+        } else {
+          departureTimes.push(actualDateTime.toString())
         }
-      } else {
+    } else {
+         // If only plannedDateTime is present
          if ('plannedDateTime' in trips[index].legs[0].origin) {
-            departureTimes.push(trips[index].legs[0].origin.plannedDateTime.toString())
+            const plannedDateTime = new Date(trips[index].legs[0].origin.plannedDateTime)
+            departureTimes.push(plannedDateTime.toString())
+         // No departure time is present
          } else {
             departureTimes.push("")
+            console.log("missing departureTime for trip " + index)
          }
-        
     }
+
+    // Check for either actualTrack or plannedTrack (prefer first)
     if ('actualTrack' in trips[index].legs[0].origin) {
         trackNumbers.push(trips[index].legs[0].origin.actualTrack.toString())
       } else {
@@ -53,10 +75,6 @@ for (var index in trips) {
   }
 
 
-function ifDelay(delayString){
-  return delayString
-}
-
 //Calculates Departure time
 function calculateTimeOffset(times)
 {
@@ -66,7 +84,7 @@ function calculateTimeOffset(times)
 //Calculates Departure time
 function timeOnly(times)
 {
-  const timestamp = Date(times)
+  const timestamp = new Date(times)
   let hours = (timestamp.getHours().toString().length > 1) ? timestamp.getHours().toString() : "0" + timestamp.getHours().toString()
   let minutes = (timestamp.getMinutes().toString().length > 1) ? timestamp.getMinutes().toString() : "0" + timestamp.getMinutes().toString()
   return hours + ':' + minutes
@@ -184,21 +202,21 @@ function createWidget() {
     FOOTER_HEIGHT = 10
     FOOTER_FONT_SIZE = 8
   } else {
-    ITEMS_COUNT = 6//8
-    HEADER_SIZE = 30
-    COLUMN_HEIGHT = 20
-    SPACING = 3
+    ITEMS_COUNT = 6
+    HEADER_SIZE = 20
+    COLUMN_HEIGHT = 30
+    SPACING = 5
     PADDING = SPACING
     LOGO_SIZE = new Size(35, COLUMN_HEIGHT)
-    STATION_SIZE = new Size(90, COLUMN_HEIGHT)
+    STATION_SIZE = new Size(85, COLUMN_HEIGHT)
     DEPART_SIZE = new Size(60, COLUMN_HEIGHT)
     TIME_SIZE = new Size(60, COLUMN_HEIGHT)
     DELAY_SIZE = new Size(40, COLUMN_HEIGHT)
     LOGO_FONT_SIZE = 14
-    STATION_FONT_SIZE = 20
-    DEPART_FONT_SIZE = 16
-    TIME_FONT_SIZE = 16
-    DELAY_FONT_SIZE = 16
+    STATION_FONT_SIZE = 18
+    DEPART_FONT_SIZE = 14
+    TIME_FONT_SIZE = 14
+    DELAY_FONT_SIZE = 12
     HEADLINE_FONT_SIZE = 24
     FOOTER_HEIGHT = 25
     FOOTER_FONT_SIZE = 8
@@ -218,7 +236,7 @@ function createWidget() {
   const topStack = stack.addStack();
   topStack.layoutVertically();
   //topStack.centerAlignContent()
-  topStack.size = new Size(LOGO_SIZE.width + STATION_SIZE.width + DEPART_SIZE.width + DELAY_SIZE.width + 2*SPACING, HEADER_SIZE);
+  topStack.size = new Size(LOGO_SIZE.width + STATION_SIZE.width + DEPART_SIZE.width + TIME_SIZE.width + DELAY_SIZE.width + 2*SPACING, HEADER_SIZE);
 
   const stationName = topStack.addText(station.toString());
   stationName.textColor = Color.white();
@@ -227,6 +245,9 @@ function createWidget() {
 
   // Horizontal spacer under headline (station) string
   stack.addSpacer(8);
+
+  // Items counts should exceed number of IC trips
+  if (ITEMS_COUNT > IC_COUNT) {ITEMS_COUNT = IC_COUNT}
 
   for (let i = 0; i < ITEMS_COUNT; i++) {
     // Will be set up with 3 columns to show line, destination and departure time
@@ -237,7 +258,7 @@ function createWidget() {
     bottomStack.layoutHorizontally();
     bottomStack.centerAlignContent()
 
-    // This middle column contains logos
+    // Left column: indicates tracknumber
     const linestack = bottomStack.addStack();
     linestack.size = LOGO_SIZE
     linestack.centerAlignContent()
@@ -248,50 +269,42 @@ function createWidget() {
     lineName.centerAlignText()
     lineName.minimumScaleFactor = 0.4
     
-    // This right columns contains name of line direction
+    // Second column: contains name of line direction
     const destinationStack = bottomStack.addStack();
     destinationStack.size = STATION_SIZE
     destinationStack.layoutVertically()
-    destinationStack.bottomAlignContent()
+    destinationStack.centerAlignContent()
     let destinationName = destinationStack.addText(truncate(destinations[i]))
     destinationName.font = Font.lightSystemFont(STATION_FONT_SIZE)
     destinationName.textColor = Color.white()
     destinationName.leftAlignText()
     destinationName.minimumScaleFactor = 0.95
     
+    // Fourth column shows minutes till depature
     const departureStack = bottomStack.addStack();
     departureStack.size = DEPART_SIZE
-    departureStack.bottomAlignContent()
-    
-    // This right column add time left to departure
-    // Add ' Min' extension if we have space for that
-    let extension = ""
-    if (widgetSize == 'medium' ||  widgetSize == 'large') {
-      extension = " Min"
-    }
+    departureStack.centerAlignContent()
     let departureOffset = departureStack.addText(calculateTimeOffset(departureTimes[i]).toString() + ' "')
     departureOffset.font = Font.boldSystemFont(DEPART_FONT_SIZE)
     departureOffset.textColor = Color.white()
     departureOffset.rightAlignText()
     departureOffset.minimumScaleFactor = 0.95
 
+    // Third column adds departure time
     const timeStack = bottomStack.addStack();
     timeStack.size = TIME_SIZE
-    timeStack.bottomAlignContent()
-
-    // This right column add time left to departure
+    timeStack.centerAlignContent()
     let departureTime = timeStack.addText(timeOnly(departureTimes[i]))
     departureTime.font = Font.lightSystemFont(TIME_FONT_SIZE)
     departureTime.textColor = Color.white()
     departureTime.rightAlignText()
     departureTime.minimumScaleFactor = 0.95
 
+    // Most rIght column shows delayed minutes
     const delayStack = bottomStack.addStack();
     delayStack.size = DELAY_SIZE
-    delayStack.bottomAlignContent()
-
-    // This right column add time left to departure
-    let delayMinutes = timeStack.addText(ifDelay(timeOnly(delays[i])))
+    delayStack.centerAlignContent()
+    let delayMinutes = timeStack.addText(timeOnly(delays[i]))
     delayMinutes.font = Font.lightSystemFont(DELAY_FONT_SIZE)
     delayMinutes.textColor = Color.red()
     delayMinutes.rightAlignText()
