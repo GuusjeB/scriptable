@@ -28,7 +28,7 @@ for (var index in trips) {
     if ('actualDateTime' in trips[index].legs[0].origin) {
         departureTimes.push(trips[index].legs[0].origin.actualDateTime.toString())
         if ('plannedDateTime' in trips[index].legs[0].origin) {
-          const delay = Math.ceil((Date('actualDateTime' in trips[index].legs[0].origin) - Date('plannedDateTime' in trips[index].legs[0].origin)) / 60000)
+          const delay = Math.ceil((Date(trips[index].legs[0].origin.actualDateTime) - Date(trips[index].legs[0].origin.plannedDateTime)) / 60000)
           if (delay > 0) {delays.push('+ ' + delay.toString())} 
           else {delays.push('')}
         }
@@ -52,6 +52,10 @@ for (var index in trips) {
     destinations.push(trips[index].legs[0].destination.name.toString().replace('Centraal', 'Cs'))
   }
 
+
+function ifDelay(delayString){
+  return delayString
+}
 
 //Calculates Departure time
 function calculateTimeOffset(times)
@@ -287,7 +291,7 @@ function createWidget() {
     delayStack.bottomAlignContent()
 
     // This right column add time left to departure
-    let delayMinutes = timeStack.addText(timeOnly(delays[i]))
+    let delayMinutes = timeStack.addText(ifDelay(timeOnly(delays[i])))
     delayMinutes.font = Font.lightSystemFont(DELAY_FONT_SIZE)
     delayMinutes.textColor = Color.red()
     delayMinutes.rightAlignText()
