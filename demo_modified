@@ -3,14 +3,51 @@
 // icon-color: blue; icon-glyph: subway;
 // ************************************************
 
+function toIsoString(date) {
+  var tzo = -date.getTimezoneOffset(),
+      dif = tzo >= 0 ? '+' : '-',
+      pad = function(num) {
+          return (num < 10 ? '0' : '') + num;
+      };
+
+  return date.getFullYear() +
+      '-' + pad(date.getMonth() + 1) +
+      '-' + pad(date.getDate()) +
+      'T' + pad(date.getHours()) +
+      ':' + pad(date.getMinutes()) +
+      ':' + pad(date.getSeconds()) +
+      dif + pad(Math.floor(Math.abs(tzo) / 60)) +
+      ':' + pad(Math.abs(tzo) % 60);
+}
+
+const now = new Date(Date.now());
+const referenceMoment = now.setHours(10);
+const MORNING = true
+const UIC_UT = '8400621'
+const UIC_ASD = '8400058'
+
+if (now > referenceMoment) {
+  MORNING = false
+  const station = "Utrecht Centraal"
+  const FROM_UIC = UIC_UT
+  const TO_UIC = UIC_ASD
+  const departureDateTimeArg = ''
+} else {
+  const station = "Amsterdam Centraal"
+  const FROM_UIC = UIC_ASD
+  const TO_UIC = UIC_UT
+  const departureDateTimeArg = "&dateTime=" + toIsoString(now.setHours(8))
+}
+
 //Set for Debug in App
 //const station = "Utrecht Centraal"
-const station = "Amsterdam Centraal"
+// const station = "Amsterdam Centraal"
 //const station = args.widgetParameter
+
 
 // Get departures NS trains
 const subscription_key = ""
-let req = new Request("https://gateway.apiportal.ns.nl/reisinformatie-api/api/v3/trips?originUicCode=8400058&destinationUicCode=8400621");
+let req = new Request("https://gateway.apiportal.ns.nl/reisinformatie-api/api/v3/trips?originUicCode=" + FROM_UIC + "&destinationUicCode=" + TO_UIC + departureDateTimeArg);
 req.method = "get";
 req.headers={"Ocp-Apim-Subscription-Key": subscription_key}
 const response = await req.loadJSON();
@@ -76,6 +113,8 @@ for (var index in trips) {
     }
     destinations.push(trips[index].legs[0].destination.name.toString().replace('Centraal', 'Cs'))
   }
+
+
 
 
 //Calculates Departure time
